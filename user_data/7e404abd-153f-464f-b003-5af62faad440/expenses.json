@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Item7",
+    "cost": 2096.18,
+    "due_date": "2025-06-25",
+    "other_possible_dates": [],
+    "urgency": 0
+  },
+  {
+    "name": "Item6",
+    "cost": 3230.57,
+    "due_date": "2025-06-26",
+    "other_possible_dates": [],
+    "urgency": 0
+  },
+  {
+    "name": "Item5",
+    "cost": 3619.21,
+    "due_date": "2025-06-23",
+    "other_possible_dates": [],
+    "urgency": 0
+  },
+  {
+    "name": "Item4",
+    "cost": 8336.9,
+    "due_date": "2025-06-24",
+    "other_possible_dates": [],
+    "urgency": 0
+  },
+  {
+    "name": "Item2",
+    "cost": 12982.26,
+    "due_date": "2025-06-23",
+    "other_possible_dates": [],
+    "urgency": 0
+  },
+  {
+    "name": "Item3",
+    "cost": 10658.2,
+    "due_date": "2025-06-23",
+    "other_possible_dates": [],
+    "urgency": 0
+  },
+  {
+    "name": "Item1",
+    "cost": 6021.15,
+    "due_date": "2025-06-22",
+    "other_possible_dates": [],
+    "urgency": 0
+  },
+  {
+    "name": "Pay: Lebron",
+    "cost": 6250000000,
+    "due_date": "2025-05-31",
+    "other_possible_dates": [],
+    "urgency": 1
+  },
+  {
+    "name": "Pay: Jose",
+    "cost": 0.04,
+    "due_date": "2025-05-31",
+    "other_possible_dates": [],
+    "urgency": 1
+  }
+]

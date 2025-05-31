@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 import tempfile
 import shutil
 api_key = os.getenv("OPENAI_API_KEY")  # Ensure you have set this environment variable
-openai.api_key = api_key  # Set the API key for OpenAI
+  # Set the API key for OpenAI
 
 def extract_text_from_pdf(file_path):
     doc = fitz.open(file_path)
@@ -92,7 +92,7 @@ from flask import send_file
 
 @app.route("/")
 def index():
-    return render_template("pages/jobapp.html")
+    return send_file("static/pages/jobapp.html")
 
 @app.route("/analyze", methods=["POST"])
 def analyze():

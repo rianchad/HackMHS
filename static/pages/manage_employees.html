@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('/static/css/best');
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="p-4 text-white text-center text-2xl font-bold">
+        Employee Management
+    </header>
+    <main class="flex-1 p-4">
+        <a href="home.html" class="text-blue-600 hover:underline text-base font-semibold mb-4 inline-block">← Back to Home</a>
+        <!-- Add Employee Form -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Add New Employee</h2>
+            <form id="addEmployeeForm" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
+                    <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label for="position" class="block text-gray-700 text-sm font-bold mb-2">Position:</label>
+                    <input type="text" id="position" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label for="pay" class="block text-gray-700 text-sm font-bold mb-2">Annual Pay:</label>
+                    <input type="number" id="pay" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label for="time_at_company" class="block text-gray-700 text-sm font-bold mb-2">Time at Company (years):</label>
+                    <input type="number" step="0.1" id="time_at_company" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label for="pay_frequency" class="block text-gray-700 text-sm font-bold mb-2">Pay Frequency:</label>
+                    <select id="pay_frequency" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="weekly">Weekly</option>
+                        <option value="biweekly">Biweekly</option>
+                        <option value="semimonthly" selected>Semimonthly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Add Employee
+                    </button>
+                </div>
+            </form>
+        </div>
+        <!-- Employee List -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Current Employees</h2>
+            <table class="table-auto w-full">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2">Name</th>
+                        <th class="px-4 py-2">Position</th>
+                        <th class="px-4 py-2">Annual Pay</th>
+                        <th class="px-4 py-2">Time at Company</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    <!-- Employee data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <footer class="p-4 text-center text-white text-sm">
+        &copy; 2025 Small Business Financial Tools. All rights reserved.
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addEmployeeForm = document.getElementById('addEmployeeForm');
+            const employeeTableBody = document.getElementById('employeeTableBody');
+
+            // Function to fetch and display employees
+            async function fetchEmployees() {
+                employeeTableBody.innerHTML = ''; // Clear existing data
+                try {
+                    const userId = localStorage.getItem('user_id');
+                    const response = await fetch(`/employees?user_id=${userId}`); // Include user ID
+                    const employees = await response.json();
+                    employees.forEach(employee => {
+                        const row = employeeTableBody.insertRow();
+                        row.insertCell().textContent = employee.name;
+                        row.insertCell().textContent = employee.position;
+                        row.insertCell().textContent = employee.pay;
+                        row.insertCell().textContent = employee.time_at_company;
+                    });
+                } catch (error) {
+                    console.error('Error fetching employees:', error);
+                    employeeTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Failed to load employees.</td></tr>';
+                }
+            }
+
+            // Initial fetch of employees
+            fetchEmployees();
+
+            // Add employee form submission
+            addEmployeeForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const name = document.getElementById('name').value;
+                const position = document.getElementById('position').value;
+                const pay = document.getElementById('pay').value;
+                const time_at_company = document.getElementById('time_at_company').value;
+                const pay_frequency = document.getElementById('pay_frequency').value;
+                const userId = localStorage.getItem('user_id'); // Get user ID
+
+                const newEmployee = {
+                    name: name,
+                    position: position,
+                    pay: parseFloat(pay),
+                    time_at_company: parseFloat(time_at_company),
+                    pay_frequency: pay_frequency, // Add pay frequency
+                    user_id: userId  // Include user ID in the request body
+                };
+
+                try {
+                    const response = await fetch('/employees', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newEmployee)
+                    });
+                    if (response.ok) {
+                        // Refresh the employee list
+                        fetchEmployees();
+                        // Clear the form
+                        addEmployeeForm.reset();
+                    } else {
+                        console.error('Failed to add employee:', response.statusText);
+                        alert('Failed to add employee.');
+                    }
+                } catch (error) {
+                    console.error('Error adding employee:', error);
+                    alert('Error adding employee.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

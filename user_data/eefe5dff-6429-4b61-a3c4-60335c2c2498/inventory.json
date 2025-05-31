@@ -1,0 +1,65 @@
+[
+  {
+    "ItemID": "Item1",
+    "Inventory": 580,
+    "restock_date": "2025-06-22",
+    "restock_amount": 274,
+    "restock_cost": 6021.15,
+    "need_restock": false,
+    "avg_cost": 21.98
+  },
+  {
+    "ItemID": "Item2",
+    "Inventory": 590,
+    "restock_date": "2025-06-23",
+    "restock_amount": 271,
+    "restock_cost": 12982.26,
+    "need_restock": false,
+    "avg_cost": 47.91
+  },
+  {
+    "ItemID": "Item3",
+    "Inventory": 610,
+    "restock_date": "2025-06-23",
+    "restock_amount": 280,
+    "restock_cost": 10658.2,
+    "need_restock": false,
+    "avg_cost": 38.06
+  },
+  {
+    "ItemID": "Item4",
+    "Inventory": 590,
+    "restock_date": "2025-06-24",
+    "restock_amount": 260,
+    "restock_cost": 8336.9,
+    "need_restock": false,
+    "avg_cost": 32.06
+  },
+  {
+    "ItemID": "Item5",
+    "Inventory": 650,
+    "restock_date": "2025-06-23",
+    "restock_amount": 298,
+    "restock_cost": 3619.21,
+    "need_restock": false,
+    "avg_cost": 12.14
+  },
+  {
+    "ItemID": "Item6",
+    "Inventory": 640,
+    "restock_date": "2025-06-26",
+    "restock_amount": 266,
+    "restock_cost": 3230.57,
+    "need_restock": false,
+    "avg_cost": 12.14
+  },
+  {
+    "ItemID": "Item7",
+    "Inventory": 630,
+    "restock_date": "2025-06-25",
+    "restock_amount": 271,
+    "restock_cost": 2096.18,
+    "need_restock": false,
+    "avg_cost": 7.74
+  }
+]

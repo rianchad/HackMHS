@@ -1,99 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login System</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <title>Login - Business Finance Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #8e2de2, #087ce8);
+            height: 100vh;
+        }
+    </style>
 </head>
-<body>
-    <div class="login-container">
-        <h1>Login</h1>
-        <form id="loginForm">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <button type="submit">Login</button>
+
+<body class="flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6 text-center" id="formTitle">Login</h2>
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-gray-700">Username</label>
+                <input id="username" type="text" placeholder="Enter your username" class="w-full border rounded p-2" required />
+            </div>
+            <div>
+                <label class="block text-gray-700">Password</label>
+                <input id="password" type="password" placeholder="Enter your password" class="w-full border rounded p-2" required />
+            </div>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Login
+            </button>
         </form>
-        <form id="registerForm" style="display: none;">
-            <label for="regUsername">Username:</label>
-            <input type="text" id="regUsername" name="regUsername" required>
-            <label for="regPassword">Password:</label>
-            <input type="password" id="regPassword" name="regPassword" required>
-            <button type="submit">Register</button>
+        <form id="registerForm" class="space-y-4" style="display:none;">
+            <div>
+                <label class="block text-gray-700">Username</label>
+                <input id="regUsername" type="text" placeholder="Choose a username" class="w-full border rounded p-2" required />
+            </div>
+            <div>
+                <label class="block text-gray-700">Password</label>
+                <input id="regPassword" type="password" placeholder="Choose a password" class="w-full border rounded p-2" required />
+            </div>
+            <div>
+                <label class="block text-gray-700">Email</label>
+                <input id="regEmail" type="email" placeholder="Enter your email" class="w-full border rounded p-2" required />
+            </div>
+            <div>
+                <label class="block text-gray-700">Company Name</label>
+                <input id="regCompanyName" type="text" placeholder="Enter your company name" class="w-full border rounded p-2" required />
+            </div>
+            <button type="submit" class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Register
+            </button>
         </form>
-        <p id="message"></p>
-        <a id="toggleForm" class="toggle-link">Don't have an account? Register</a>
+        <p id="message" class="text-center text-red-500 mt-4"></p>
+        <a id="toggleForm" class="block text-center text-blue-600 hover:underline mt-4 cursor-pointer">Don't have an account? Register</a>
     </div>
+    <script src="/static/js/script.js"></script>
     <script>
         // Toggle between login and register forms
+        const toggleForm = document.getElementById('toggleForm');
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
-        const toggleForm = document.getElementById('toggleForm');
+        const formTitle = document.getElementById('formTitle');
         const message = document.getElementById('message');
 
-        toggleForm.addEventListener('click', function() {
-            if (loginForm.style.display !== 'none') {
-                loginForm.style.display = 'none';
-                registerForm.style.display = '';
-                toggleForm.textContent = 'Already have an account? Login';
-                message.textContent = '';
-            } else {
+        let showingLogin = true;
+        toggleForm.addEventListener('click', () => {
+            showingLogin = !showingLogin;
+            if (showingLogin) {
                 loginForm.style.display = '';
                 registerForm.style.display = 'none';
+                formTitle.textContent = 'Login';
                 toggleForm.textContent = "Don't have an account? Register";
+                message.textContent = '';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = '';
+                formTitle.textContent = 'Register';
+                toggleForm.textContent = "Already have an account? Login";
                 message.textContent = '';
             }
         });
 
         // Handle login
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            message.textContent = '';
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-            fetch('/login', {
+            const res = await fetch('/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            })
-            .then(async response => {
-                const data = await response.json();
-                if (response.ok) {
-                    // Redirect to home with username in URL
-                    window.location.href = `/static/pages/home.html?username=${encodeURIComponent(username)}`;
-                } else {
-                    message.textContent = data.message || 'Login failed.';
-                }
-            })
-            .catch(() => {
-                message.textContent = 'Unable to connect to server.';
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
             });
+            const data = await res.json();
+            if (res.ok) {
+                message.style.color = 'green';
+                message.textContent = data.message || 'Login successful!';
+                // Store all user info if available
+                localStorage.setItem('username', username);
+                if (data.user_id) localStorage.setItem('user_id', data.user_id);
+                if (data.email) localStorage.setItem('email', data.email);
+                if (data.company_name) localStorage.setItem('company_name', data.company_name);
+                setTimeout(() => { window.location.href = '/home.html'; }, 800);
+            } else {
+                message.style.color = 'red';
+                message.textContent = data.message || 'Login failed.';
+            }
         });
 
         // Handle register
-        registerForm.addEventListener('submit', function(e) {
+        registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            message.textContent = '';
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value;
-            fetch('/register', {
+            const email = document.getElementById('regEmail').value.trim();
+            const companyName = document.getElementById('regCompanyName').value.trim();
+
+            const res = await fetch('/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            })
-            .then(async response => {
-                const data = await response.json();
-                if (response.ok) {
-                    // Redirect to home with username in URL
-                    window.location.href = `/static/pages/home.html?username=${encodeURIComponent(username)}`;
-                } else {
-                    message.textContent = data.message || 'Registration failed.';
-                }
-            })
-            .catch(() => {
-                message.textContent = 'Unable to connect to server.';
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    email: email,
+                    company_name: companyName
+                })
             });
+            const data = await res.json();
+            if (res.ok) {
+                message.style.color = 'green';
+                message.textContent = data.message || 'Registration successful!';
+                localStorage.setItem('username', username);
+                if (data.user_id) localStorage.setItem('user_id', data.user_id);
+                localStorage.setItem('email', email);
+                localStorage.setItem('company_name', companyName);
+                setTimeout(() => {
+                    toggleForm.click();
+                }, 800);
+            } else {
+                message.style.color = 'red';
+                message.textContent = data.message || 'Registration failed.';
+            }
         });
     </script>
 </body>
+
 </html>

@@ -1,21 +1,25 @@
+/* General Body Styling */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    margin: 0;
+    box-sizing: border-box;
 }
 
+/* Login Container */
 .login-container {
-    margin-top: 60px;
+    margin: 0 auto;
     background: #fff;
-    padding: 32px 28px 28px 28px;
+    padding: 32px 28px;
     border-radius: 10px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
     width: 340px;
-    text-align: center;
+    text-align: center; /* Center-align text and elements */
 }
 
 .login-container h1 {
@@ -23,24 +27,27 @@ body {
     color: #007BFF;
 }
 
-.login-container input[type="file"] {
-    margin: 18px 0 12px 0;
-    padding: 8px;
+.login-container input {
+    width: 80%; /* Adjust width to make it smaller */
+    margin: 10px auto; /* Center horizontally */
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    display: block; /* Ensure it behaves like a block element */
     background: #f9f9f9;
 }
 
 .login-container button {
-    margin-bottom: 12px;
-    margin-top: 0;
-    width: 100%;
+    width: 80%; /* Match the width of the input fields */
+    margin: 10px auto;
     padding: 12px;
-    font-size: 1rem;
-    border-radius: 4px;
+    background-color: #007BFF;
+    color: white;
     border: none;
-    background: #007BFF;
-    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: block; /* Center-align the button */
     transition: background 0.2s;
 }
 
@@ -49,19 +56,8 @@ body {
     cursor: not-allowed;
 }
 
-.login-container button:not(:last-child) {
-    margin-bottom: 10px;
-}
-
-.login-container button:hover:enabled {
-    background: #0056b3;
-}
-
-#revenueMessage {
-    margin: 16px 0 8px 0;
-    min-height: 20px;
-    color: #333;
-    font-size: 1rem;
+.login-container button:hover {
+    background-color: #0056b3;
 }
 
 .login-container a {
@@ -76,33 +72,7 @@ body {
     text-decoration: underline;
 }
 
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-#message {
-    color: red;
-    margin-top: 10px;
-}
-
+/* Toggle Link */
 .toggle-link {
     color: #007BFF;
     cursor: pointer;
@@ -113,6 +83,36 @@ button:hover {
 
 .toggle-link:hover {
     color: #0056b3;
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Messages */
+#message {
+    color: red;
+    margin-top: 10px;
+}
+
+#revenueMessage {
+    margin: 16px 0 8px 0;
+    min-height: 20px;
+    color: #333;
+    font-size: 1rem;
 }
 
 /* AI Feature Styling */
@@ -132,7 +132,7 @@ button:hover {
     background-color: #f9f9f9;
 }
 
-/* Home Page Banner and Content */
+/* Home Page Banner */
 .banner {
     background-color: #007BFF;
     color: white;
@@ -150,7 +150,81 @@ button:hover {
     text-decoration: underline;
 }
 
+/* Content Section */
 .content {
     padding: 20px;
     text-align: center;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Preformatted Text */
+pre {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    margin: 10px 0;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .container {
+        max-width: 100vw;
+        padding: 10px;
+        margin: 0;
+    }
+
+    pre {
+        max-height: 120px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 5px;
+    }
+
+    input, textarea, button {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 400px) {
+    .container {
+        padding: 5px;
+    }
+
+    input, textarea, button {
+        font-size: 12px;
+    }
 }

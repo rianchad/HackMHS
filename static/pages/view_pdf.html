@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Annotated PDF</title>
+  <style>
+    body { margin: 0; padding: 0; background: #222; }
+    .pdf-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .toolbar {
+      background: #1976d2;
+      color: #fff;
+      padding: 10px;
+      font-size: 18px;
+    }
+    .pdf-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="pdf-container">
+    <a href="home.html" class="text-blue-600 hover:underline text-base font-semibold mb-4 inline-block" style="background:#fff;padding:6px 12px;border-radius:6px;margin:10px;">← Back to Home</a>
+    <div class="toolbar">
+      <a href="{{ url_for('jobapp_download_file', filename=filename) }}" style="color:#fff;text-decoration:underline;">Download PDF</a>
+    </div>
+    <iframe class="pdf-frame" src="{{ url_for('jobapp_serve_pdf_file', filename=filename) }}"></iframe>
+  </div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+body {
+    background: linear-gradient(135deg, #e3f2fd 0%, #e0f7fa 100%);
+}
+header {
+    background: linear-gradient(90deg, #1976d2 60%, #26c6da 100%);
+    border-bottom-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+    box-shadow: 0 4px 24px rgba(25,118,210,0.10);
+}
+.main-card {
+    background: linear-gradient(135deg, #fff 80%, #e3f2fd 100%);
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 24px rgba(25,118,210,0.10);
+    border: 1.5px solid #bbdefb;
+}
+input, textarea, button {
+    border-radius: 0.75rem !important;
+    border-width: 1.5px !important;
+    border-color: #bbdefb !important;
+    background: #f8fafd !important;
+    transition: border-color 0.2s, background 0.2s;
+}
+input:focus, textarea:focus {
+    border-color: #1976d2 !important;
+    background: #f1f8ff !important;
+}
+button {
+    background: linear-gradient(90deg, #26c6da 60%, #1976d2 100%);
+    color: #0455f6 !important;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(25,118,210,0.08);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+     
+    }
+   
+
+    
+
+button:hover {
+    background: linear-gradient(90deg, #1976d2 60%, #26c6da 100%);
+    box-shadow: 0 4px 16px rgba(25,118,210,0.12);
+    transform: scale(1.03);
+    color: #1976d2 !important; /* Ensure blue text on hover */
+
+}
+.bg-gray-800, footer {
+    background: linear-gradient(90deg, #1976d2 60%, #26c6da 100%) !important;
+    border-top-left-radius: 2rem;
+    border-top-right-radius: 2rem;
+}
+a {
+    color: #1976d2;
+    font-weight: 500;
+    transition: color 0.18s;
+}
+a:hover {
+    color: #00416e;
+    text-decoration: underline;
+}

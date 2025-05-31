@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e3f2fd 0%, #e0f7fa 100%);
+        }
+        header {
+            background: linear-gradient(90deg, #1976d2 60%, #26c6da 100%);
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            box-shadow: 0 4px 24px rgba(25,118,210,0.10);
+        }
+        .bg-white {
+            background: linear-gradient(135deg, #fff 80%, #e3f2fd 100%) !important;
+            border-radius: 1.5rem !important;
+            box-shadow: 0 4px 24px rgba(25,118,210,0.10);
+            border: 1.5px solid #bbdefb;
+        }
+        input, select, button {
+            border-radius: 0.75rem !important;
+            border-width: 1.5px !important;
+            border-color: #bbdefb !important;
+            background: #f8fafd !important;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: #1976d2 !important;
+            background: #f1f8ff !important;
+        }
+        button {
+            background: linear-gradient(90deg, #26c6da 60%, #1976d2 100%);
+            color: #0b79bd !important;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.08);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #1976d2 60%, #26c6da 100%);
+            box-shadow: 0 4px 16px rgba(25,118,210,0.12);
+            transform: scale(1.03);
+        }
+        .bg-gray-800, footer {
+            background: linear-gradient(90deg, #1976d2 60%, #26c6da 100%) !important;
+            border-top-left-radius: 2rem;
+            border-top-right-radius: 2rem;
+        }
+        .text-blue-700, .text-blue-600 {
+            color: #1976d2 !important;
+        }
+        .text-gray-700 {
+            color: #34495e !important;
+        }
+        .rounded-lg, .rounded, .rounded-xl, .rounded-2xl {
+            border-radius: 1.5rem !important;
+        }
+        .shadow-lg, .shadow, .shadow-md, .shadow-xl {
+            box-shadow: 0 4px 24px rgba(25,118,210,0.10), 0 1.5px 4px rgba(25,118,210,0.08) !important;
+        }
+        a {
+            color: #1976d2;
+            font-weight: 500;
+            transition: color 0.18s;
+        }
+        a:hover {
+            color: #00416e;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <header class="p-4 text-white text-center text-2xl font-bold">
+        Inventory Management
+    </header>
+    <main class="flex-1 flex flex-col items-center justify-start mt-10">
+        <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-xl">
+            <h2 class="text-xl font-semibold text-blue-700 mb-4">Inventory Check & Restock</h2>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-1">Inventory CSV</label>
+                <input type="file" id="inventoryCsvFile" accept=".csv" class="block w-full border border-gray-300 rounded px-3 py-2 mb-2">
+                <small class="text-gray-500">Format: ItemID,InitialInventory</small>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-1">Tolerance (days before runout)</label>
+                <input type="number" id="inventoryTolerance" value="7" min="1" step="1" class="block w-full border border-gray-300 rounded px-3 py-2 mb-2">
+                <label class="block text-gray-700 mb-1">Restock Days (days to cover per restock)</label>
+                <input type="number" id="inventoryRestockDays" value="14" min="1" step="1" class="block w-full border border-gray-300 rounded px-3 py-2 mb-2">
+                <label class="block text-gray-700 mb-1">Restock Amount (units)</label>
+                <input type="number" id="inventoryRestockAmount" value="100" min="1" step="1" class="block w-full border border-gray-300 rounded px-3 py-2 mb-2">
+            </div>
+            <div class="flex space-x-2 mb-4">
+                <button id="loadSavedInventory" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm">
+                    Load Saved Inventory
+                </button>
+                <button id="loadSavedRestock" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded text-sm">
+                    Load Saved Restock Actions
+                </button>
+            </div>
+            <button id="runInventory" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded mb-3 transition-colors">
+                Run Inventory Check
+            </button>
+            <div id="inventoryResult" class="min-h-[24px] text-gray-700 text-sm mt-2"></div>
+            <div class="mt-4">
+                <a href="home.html" class="text-blue-600 hover:underline">← Back to Home</a>
+            </div>
+        </div>
+    </main>
+    <footer class="p-4 text-center text-white text-sm mt-8">
+        &copy; 2025 Small Business Financial Tools. All rights reserved.
+    </footer>
+    <script>
+    document.getElementById('runInventory').addEventListener('click', async function() {
+        const tolerance = parseInt(document.getElementById('inventoryTolerance').value);
+        const restockDays = parseInt(document.getElementById('inventoryRestockDays').value);
+        const restockAmount = parseInt(document.getElementById('inventoryRestockAmount').value);
+        const resultDiv = document.getElementById('inventoryResult');
+        const fileInput = document.getElementById('inventoryCsvFile');
+        resultDiv.textContent = 'Checking inventory...';
+
+        let formData = new FormData();
+        const userId = localStorage.getItem('user_id');
+        if (!userId) {
+            resultDiv.textContent = 'User ID missing.';
+            return;
+        }
+        formData.append('user_id', userId);
+        if (fileInput.files.length > 0) {
+            formData.append('inventory_csv', fileInput.files[0]);
+        }
+        formData.append('tolerance', tolerance);
+        formData.append('restock_days', restockDays);
+        formData.append('restock_amount', restockAmount);
+
+        try {
+            const resp = await fetch('/run_inventory', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await resp.json();
+            if (resp.ok) {
+                let html = '';
+                // Restock Actions Table
+                if (data.restock_actions && data.restock_actions.length > 0) {
+                    html += '<b>Restock Actions:</b>';
+                    html += `<table class="w-full text-sm mb-2 border"><thead><tr>
+                        <th class="border px-2 py-1">Item</th>
+                        <th class="border px-2 py-1">Restock Date</th>
+                        <th class="border px-2 py-1">Amount</th>
+                        <th class="border px-2 py-1">Cost</th>
+                        <th class="border px-2 py-1">New Inventory</th>
+                        <th class="border px-2 py-1">Add to Calendar</th>
+                        <th class="border px-2 py-1">Add as Expense</th>
+                    </tr></thead><tbody>`;
+                    data.restock_actions.forEach((act, idx) => {
+                        html += `<tr>
+                            <td class="border px-2 py-1">${act.item}</td>
+                            <td class="border px-2 py-1">${act.restock_date}</td>
+                            <td class="border px-2 py-1">${act.restock_amount}</td>
+                            <td class="border px-2 py-1">$${act.restock_cost}</td>
+                            <td class="border px-2 py-1">${act.new_inventory}</td>
+                            <td class="border px-2 py-1">
+                                <button class="add-to-calendar bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                                    data-date="${act.restock_date}"
+                                    data-title="Restock: ${act.item}"
+                                    data-desc="Restock ${act.restock_amount} units at $${act.restock_cost}">
+                                    Add to Calendar
+                                </button>
+                            </td>
+                            <td class="border px-2 py-1">
+                                <button class="add-as-expense bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+                                    data-item="${act.item}"
+                                    data-cost="${act.restock_cost}"
+                                    data-date="${act.restock_date}">
+                                    Add as Expense
+                                </button>
+                            </td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                } else {
+                    html += '<div>No items need restocking within the specified tolerance.</div>';
+                }
+                // Current Inventory Table
+                html += '<b>Current Inventory:</b>';
+                html += `<table class="w-full text-sm mb-2 border"><thead><tr>
+                    <th class="border px-2 py-1">Item</th>
+                    <th class="border px-2 py-1">Inventory</th>
+                    <th class="border px-2 py-1">Next Restock Date</th>
+                    <th class="border px-2 py-1">Restock Amount</th>
+                    <th class="border px-2 py-1">Restock Cost</th>
+                    <th class="border px-2 py-1">Add to Calendar</th>
+                    <th class="border px-2 py-1">Add as Expense</th>
+                </tr></thead><tbody>`;
+                data.inventory.forEach(inv => {
+                    html += `<tr>
+                        <td class="border px-2 py-1">${inv.ItemID}</td>
+                        <td class="border px-2 py-1">${inv.Inventory}</td>
+                        <td class="border px-2 py-1">${inv.restock_date ? inv.restock_date : '-'}</td>
+                        <td class="border px-2 py-1">${inv.restock_amount ? inv.restock_amount : '-'}</td>
+                        <td class="border px-2 py-1">${inv.restock_cost ? '$' + inv.restock_cost : '-'}</td>
+                        <td class="border px-2 py-1">
+                            <button class="add-to-calendar bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                                data-date="${inv.restock_date}"
+                                data-title="Restock: ${inv.ItemID}"
+                                data-desc="Restock ${inv.restock_amount} units at $${inv.restock_cost}">
+                                Add to Calendar
+                            </button>
+                        </td>
+                        <td class="border px-2 py-1">
+                            <button class="add-as-expense bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+                                data-item="${inv.ItemID}"
+                                data-cost="${inv.restock_cost}"
+                                data-date="${inv.restock_date}">
+                                Add as Expense
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                resultDiv.innerHTML = html;
+
+                // Add event listeners for "Add to Calendar" buttons
+                document.querySelectorAll('.add-to-calendar').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const date = btn.getAttribute('data-date');
+                        const title = btn.getAttribute('data-title');
+                        const desc = btn.getAttribute('data-desc');
+                        btn.disabled = true;
+                        btn.textContent = 'Adding...';
+                        try {
+                            const resp = await fetch('/api/calendar/add_event', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ date, title, desc })
+                            });
+                            const res = await resp.json();
+                            if (res.success) {
+                                btn.textContent = 'Added!';
+                                btn.classList.remove('bg-blue-500', 'hover:bg-blue-700');
+                                btn.classList.add('bg-green-500');
+                            } else {
+                                btn.textContent = 'Error';
+                                btn.disabled = false;
+                            }
+                        } catch (e) {
+                            btn.textContent = 'Error';
+                            btn.disabled = false;
+                        }
+                    });
+                });
+
+                // Add event listeners for "Add as Expense" buttons
+                document.querySelectorAll('.add-as-expense').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const item = btn.getAttribute('data-item');
+                        const cost = btn.getAttribute('data-cost');
+                        const date = btn.getAttribute('data-date');
+
+                        // Get current expenses array from localStorage, or empty array
+                        let expenses = [];
+                        try {
+                            expenses = JSON.parse(localStorage.getItem('expenses_to_add') || '[]');
+                        } catch (e) {
+                            expenses = [];
+                        }
+                        // Add new expense
+                        expenses.push({
+                            name: item,
+                            cost: cost,
+                            due_date: date
+                        });
+                        localStorage.setItem('expenses_to_add', JSON.stringify(expenses));
+
+                        // Optionally, give user feedback
+                        btn.textContent = 'Saved!';
+                        btn.disabled = true;
+                        btn.classList.remove('bg-red-500', 'hover:bg-red-700');
+                        btn.classList.add('bg-green-500');
+                    });
+                });
+            } else {
+                resultDiv.textContent = data.message || 'Inventory check failed.';
+            }
+        } catch (err) {
+            resultDiv.textContent = 'Error running inventory check.';
+        }
+    });
+
+    // --- Load Saved Inventory ---
+    document.getElementById('loadSavedInventory').addEventListener('click', async function() {
+        const userId = localStorage.getItem('user_id');
+        const resultDiv = document.getElementById('inventoryResult');
+        if (!userId) {
+            resultDiv.textContent = 'User ID missing.';
+            return;
+        }
+        resultDiv.textContent = 'Loading saved inventory...';
+        try {
+            const resp = await fetch(`/api/inventory?user_id=${encodeURIComponent(userId)}`);
+            const data = await resp.json();
+            if (resp.ok && data.inventory) {
+                let html = '<b>Saved Inventory:</b>';
+                html += `<table class="w-full text-sm mb-2 border"><thead><tr>
+                    <th class="border px-2 py-1">Item</th>
+                    <th class="border px-2 py-1">Inventory</th>
+                    <th class="border px-2 py-1">Next Restock Date</th>
+                    <th class="border px-2 py-1">Restock Amount</th>
+                    <th class="border px-2 py-1">Restock Cost</th>
+                </tr></thead><tbody>`;
+                data.inventory.forEach(inv => {
+                    html += `<tr>
+                        <td class="border px-2 py-1">${inv.ItemID}</td>
+                        <td class="border px-2 py-1">${inv.Inventory}</td>
+                        <td class="border px-2 py-1">${inv.restock_date ? inv.restock_date : '-'}</td>
+                        <td class="border px-2 py-1">${inv.restock_amount ? inv.restock_amount : '-'}</td>
+                        <td class="border px-2 py-1">${inv.restock_cost ? '$' + inv.restock_cost : '-'}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                resultDiv.innerHTML = html;
+            } else {
+                resultDiv.textContent = data.message || 'No saved inventory found.';
+            }
+        } catch (e) {
+            resultDiv.textContent = 'Error loading saved inventory.';
+        }
+    });
+
+    // --- Load Saved Restock Actions ---
+    document.getElementById('loadSavedRestock').addEventListener('click', async function() {
+        const userId = localStorage.getItem('user_id');
+        const resultDiv = document.getElementById('inventoryResult');
+        if (!userId) {
+            resultDiv.textContent = 'User ID missing.';
+            return;
+        }
+        resultDiv.textContent = 'Loading saved restock actions...';
+        try {
+            const resp = await fetch(`/api/restock_actions?user_id=${encodeURIComponent(userId)}`);
+            const data = await resp.json();
+            if (resp.ok && data.restock_actions) {
+                let html = '<b>Saved Restock Actions:</b>';
+                html += `<table class="w-full text-sm mb-2 border"><thead><tr>
+                    <th class="border px-2 py-1">Item</th>
+                    <th class="border px-2 py-1">Restock Date</th>
+                    <th class="border px-2 py-1">Amount</th>
+                    <th class="border px-2 py-1">Cost</th>
+                    <th class="border px-2 py-1">New Inventory</th>
+                </tr></thead><tbody>`;
+                data.restock_actions.forEach(act => {
+                    html += `<tr>
+                        <td class="border px-2 py-1">${act.item}</td>
+                        <td class="border px-2 py-1">${act.restock_date}</td>
+                        <td class="border px-2 py-1">${act.restock_amount}</td>
+                        <td class="border px-2 py-1">$${act.restock_cost}</td>
+                        <td class="border px-2 py-1">${act.new_inventory}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                resultDiv.innerHTML = html;
+            } else {
+                resultDiv.textContent = data.message || 'No saved restock actions found.';
+            }
+        } catch (e) {
+            resultDiv.textContent = 'Error loading saved restock actions.';
+        }
+    });
+    </script>
+</body>
+</html>

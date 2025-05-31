@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e3f2fd 0%, #e0f7fa 100%);
+        }
+        header {
+            background: linear-gradient(90deg, #1976d2 60%, #26c6da 100%);
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            box-shadow: 0 4px 24px rgba(25,118,210,0.10);
+        }
+        section.bg-white, .bg-white {
+            background: linear-gradient(135deg, #fff 80%, #e3f2fd 100%) !important;
+            border-radius: 1.5rem !important;
+            box-shadow: 0 4px 24px rgba(25,118,210,0.10);
+            border: 1.5px solid #bbdefb;
+        }
+        input, select, button, textarea {
+            border-radius: 0.75rem !important;
+            border-width: 1.5px !important;
+            border-color: #bbdefb !important;
+            background: #f8fafd !important;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #1976d2 !important;
+            background: #f1f8ff !important;
+        }
+        button {
+            background: linear-gradient(90deg, #26c6da 60%, #1976d2 100%);
+            color: #287ad7 !important;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.08);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #1976d2 60%, #26c6da 100%);
+            box-shadow: 0 4px 16px rgba(25,118,210,0.12);
+            transform: scale(1.03);
+        }
+        .bg-gray-800, .bg-gray-900, footer {
+            background: linear-gradient(90deg, #1976d2 60%, #26c6da 100%) !important;
+            border-top-left-radius: 2rem;
+            border-top-right-radius: 2rem;
+        }
+        .text-blue-700, .text-blue-600 {
+            color: #1976d2 !important;
+        }
+        .text-gray-700 {
+            color: #34495e !important;
+        }
+        .rounded-lg, .rounded, .rounded-xl, .rounded-2xl {
+            border-radius: 1.5rem !important;
+        }
+        .shadow-lg, .shadow, .shadow-md, .shadow-xl {
+            box-shadow: 0 4px 24px rgba(25,118,210,0.10), 0 1.5px 4px rgba(25,118,210,0.08) !important;
+        }
+        a {
+            color: #1976d2;
+            font-weight: 500;
+            transition: color 0.18s;
+        }
+        a:hover {
+            color: #00416e;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-blue-600 p-4 text-white text-center text-2xl font-bold relative">
+        <a href="home.html" class="absolute left-4 top-1/2 transform -translate-y-1/2 px-3 py-1 bg-blue-500 rounded hover:bg-blue-700 text-white text-base font-medium shadow">
+            &larr; Back
+        </a>
+        Calendar
+        <div id="welcomeMessage" class="text-base font-normal mt-2"></div>
+    </header>
+
+<!-- Calendar -->
+ <section class="bg-white p-3 rounded shadow md:col-span-2 w-full" style="height: 100vh;">
+    <div id="calendar-controls" class="flex items-center mb-2 space-x-2">
+    <button id="prevMonth" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">&lt;</button>
+    <span id="calendarMonthYear" class="font-semibold"></span>
+    <button id="nextMonth" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">&gt;</button>
+    </div>
+    <div id="calendar" class="overflow-x-auto" style="font-size:1.25rem;">
+    <!-- Calendar table will be rendered here -->
+    </div>
+</section>
+<div id="eventModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-lg">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Add New Event</h3>
+                <div class="mt-2">
+                    <label for="eventTitle" class="block text-sm font-medium text-gray-700">Title:</label>
+                    <input type="text" id="eventTitle" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div class="mt-2">
+                    <label for="eventDescription" class="block text-sm font-medium text-gray-700">Description:</label>
+                    <textarea id="eventDescription" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
+                </div>
+                <input type="hidden" id="eventDate">
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" id="addEventButton" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">Add</button>
+                <button type="button" id="cancelEventButton" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+// --- Calendar logic with expandable events and add/remove functionality ---
+const calendarEl = document.getElementById('calendar');
+const monthYearEl = document.getElementById('calendarMonthYear');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+let today = new Date();
+let currentMonth = today.getMonth() + 1;
+let currentYear = today.getFullYear();
+
+// Track expanded days by date string (YYYY-MM-DD)
+let expandedDays = {};
+
+// Keep track of the currently selected date
+let selectedDate = null;
+
+// Helper to format date as YYYY-MM-DD
+function formatDate(year, month, day) {
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function renderCalendarTable(calendarData) {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    let html = '<table class="min-w-full border-collapse table-fixed" style="table-layout:"fixed";">';
+    html += '<thead><tr>' + days.map(d => `<th class="border px-2 py-1 bg-gray-100">${d}</th>`).join('') + '</tr></thead>';
+    html += '<tbody>';
+    for (let weekIdx = 0; weekIdx < calendarData.length; weekIdx++) {
+        const week = calendarData[weekIdx];
+        html += '<tr>';
+        for (let dayIdx = 0; dayIdx < week.length; dayIdx++) {
+            const day = week[dayIdx];
+            if (!day) {
+                html += '<td class="border px-2 py-1 bg-gray-50"></td>';
+                continue;
+            }
+            const [dateNum, events, dateStr] = [day[0], day[1], day[2]];
+            const isToday = (dateNum === today.getDate() && currentMonth === today.getMonth()+1 && currentYear === today.getFullYear());
+            const cellDate = formatDate(currentYear, currentMonth, dateNum);
+            const eventCount = events.length;
+            const expanded = expandedDays[cellDate];
+            html += `<td class="border px-2 py-1 align-top ${isToday ? 'bg-blue-200' : ''}">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold">${dateNum}</span>
+                    <button class="add-event-btn text-green-600 text-lg font-bold" data-date="${cellDate}" title="Add event">+</button>
+                </div>
+                <div>
+                    ${eventCount > 0
+                        ? `<button class="toggle-events-btn text-blue-600 underline text-xs" data-date="${cellDate}">
+                            ${eventCount} event${eventCount > 1 ? 's' : ''}
+                           </button>`
+                        : `<span class="text-gray-400 text-xs">No events</span>`
+                    }
+                </div>
+                <div class="event-list" data-date="${cellDate}" style="display:${expanded ? 'block-inline' : 'none'};">
+                    ${events.map((ev, idx) =>
+                        `<div class="bg-blue-50 rounded flex flex-column">
+                            <button class=" items-right remove-event-btn text-red-500 text-xs ml-2" data-date="${cellDate}" data-idx="${idx}" title="Remove event">✕</button>
+                            <div style="display: flex; flex-direction:column">
+                                <span class="font-semibold">${ev[0]}</span>
+                                <p class="text-gray-500 text-xs ">${ev[1]}</p>
+                            </div>
+                            
+                        </div>`
+                    ).join('')}
+                </div>
+            </td>`;
+        }
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    return html;
+}
+
+function updateCalendar() {
+    fetch(`/api/calendar?month=${currentMonth}&year=${currentYear}`)
+        .then(res => res.json())
+        .then(data => {
+            // Attach date string to each day for easier event handling
+            const calData = data.calendar.map(week =>
+                week.map(day => {
+                    if (!day) return null;
+                    // day[0]=dateNum, day[1]=events
+                    const dateNum = day[0];
+                    const dateStr = formatDate(currentYear, currentMonth, dateNum);
+                    return [dateNum, day[1], dateStr];
+                })
+            );
+            calendarEl.innerHTML = renderCalendarTable(calData);
+            const monthName = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long' });
+            monthYearEl.textContent = `${monthName} ${currentYear}`;
+
+            // Add event listeners for expand/collapse
+            document.querySelectorAll('.toggle-events-btn').forEach(btn => {
+                btn.onclick = function() {
+                    const date = btn.getAttribute('data-date');
+                    expandedDays[date] = !expandedDays[date];
+                    updateCalendar();
+                };
+            });
+
+            // --- Modal Logic ---
+            const eventModal = document.getElementById('eventModal');
+            const eventTitleInput = document.getElementById('eventTitle');
+            const eventDescriptionInput = document.getElementById('eventDescription');
+            const eventDateInput = document.getElementById('eventDate');
+            const addEventButton = document.getElementById('addEventButton');
+            const cancelEventButton = document.getElementById('cancelEventButton');
+            // Close modal when clicking the overlay
+            eventModal.querySelector('.fixed.inset-0').onclick = function(e) {
+                if (e.target === this) {
+                    eventModal.classList.add('hidden');
+                    eventTitleInput.value = '';
+                    eventDescriptionInput.value = '';
+                    selectedDate = null;
+                }
+            };
+
+            // Function to open the modal
+            function openModal(date) {
+                selectedDate = date;
+                eventDateInput.value = date;
+                eventModal.classList.remove('hidden');
+            }
+
+            // Function to close the modal
+            function closeModal() {
+                eventModal.classList.add('hidden');
+                eventTitleInput.value = '';
+                eventDescriptionInput.value = '';
+                selectedDate = null;
+            }
+
+            // Add event listeners for add event
+            document.querySelectorAll('.add-event-btn').forEach(btn => {
+                btn.onclick = function() {
+                    const date = btn.getAttribute('data-date');
+                    openModal(date);
+                };
+            });
+
+            // Event listener for adding an event
+            addEventButton.onclick = function() {
+                const date = eventDateInput.value;
+                const title = eventTitleInput.value;
+                const desc = eventDescriptionInput.value;
+
+                fetch('/api/calendar/add_event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date, title, desc })
+                }).then(res => res.json()).then(res => {
+                    if (res.success) {
+                        expandedDays[date] = true;
+                        updateCalendar();
+                        closeModal();
+                    } else {
+                        alert('Failed to add event: ' + (res.error || 'Unknown error'));
+                    }
+                });
+            };
+
+            // Event listener for canceling
+            cancelEventButton.onclick = function() {
+                closeModal();
+            };
+
+            // Add event listeners for remove event
+            document.querySelectorAll('.remove-event-btn').forEach(btn => {
+                btn.onclick = function() {
+                    const date = btn.getAttribute('data-date');
+                    const idx = btn.getAttribute('data-idx');
+                    fetch('/api/calendar/remove_event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ date, idx: parseInt(idx) })
+                    }).then(res => res.json()).then(res => {
+                        if (res.success) {
+                            updateCalendar();
+                        } else {
+                            alert('Failed to remove event: ' + (res.error || 'Unknown error'));
+                        }
+                    });
+                };
+            });
+        });
+}
+
+prevMonthBtn.onclick = function() {
+    currentMonth--;
+    if (currentMonth < 1) {
+        currentMonth = 12;
+        currentYear--;
+    }
+    expandedDays = {};
+    updateCalendar();
+};
+nextMonthBtn.onclick = function() {
+    currentMonth++;
+    if (currentMonth > 12) {
+        currentMonth = 1;
+        currentYear++;
+    }
+    expandedDays = {};
+    updateCalendar();
+};
+
+updateCalendar();
+</script></script>

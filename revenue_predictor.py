@@ -309,7 +309,7 @@ def register():
         users = load_users()
         if username in users:
             return jsonify({'message': 'Username already exists.'}), 409
-        users[username] = password
+        users[username] = password  # Store as string
         save_users(users)
         return jsonify({'message': 'Registration successful.'}), 200
     except Exception:
@@ -322,6 +322,7 @@ def login():
         username = data.get('username', '').strip()
         password = data.get('password', '')
         users = load_users()
+        # Compare as string
         if username in users and users[username] == password:
             return jsonify({'message': 'Login successful.'}), 200
         else:

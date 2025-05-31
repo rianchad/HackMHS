@@ -1,53 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="</section>UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Business Finance Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .custom-btn {
+            color: #fff;
+            font-weight: bold;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            width: 100%;
+            transition: background 0.2s;
+            border: none;
+        }
+        .custom-btn:hover {
+            filter: brightness(0.85);
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <!-- Header -->
-    <header class="bg-blue-600 p-4 text-white text-center text-2xl font-bold">
+    <header class="bg-blue-600 bg-opacity-81 p-4 text-white text-center text-2xl font-bold">
         Business Finance Manager
         <div id="welcomeMessage" class="text-base font-normal mt-2"></div>
+        <div id="emailDisplay" class="text-base font-normal mt-2"></div>
+        <div id="companyNameDisplay" class="text-base font-normal mt-2"></div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <main class="flex p-10 justify-center items-center mb-auto">
         <!-- Financial Overview -->
-        <section class="bg-white p-4 rounded shadow">
-            <h2 class="text-xl font-semibold mb-4">Financial Overview</h2>
-            <p class="text-gray-700">View your revenue, expenses, and profit summaries here.</p>
+        <section class="bg-white p-8 rounded-xl shadow-lg md:col-span-2 w-full max-w-4xl">
+            <h2 class="text-2xl font-bold mb-4">Financial Overview</h2>
+            <p class="text-gray-700 text-base mb-4">View your revenue, expenses, and profit summaries here.</p>
             <a href="manage_revenue.html">
-                <button class="mt-4 w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                <button class="custom-btn text-lg py-3" style="background: rgb(47, 190, 162);">
                     Manage Revenue
                 </button>
-        </section>
+            </a>
 
-        <!-- ChatGPT Assistant -->
-        <section class="bg-white p-4 rounded shadow">
-            <h2 class="text-xl font-semibold mb-4">AI Assistant</h2>
-            <iframe src="https://chat.openai.com" class="w-full h-64 border rounded"></iframe>
-            <p class="text-gray-600 text-sm mt-2">Use the AI Assistant for quick advice or help with financial tasks.</p>
-        </section>
-
-        <!-- Tools Section -->
-        <section class="bg-white p-4 rounded shadow">
-            <h2 class="text-xl font-semibold mb-4">Tools</h2>
-            <div class="text-gray-700">
-                <a href="jobapp.html">
-                    <button class="mt-2 w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                        Job Application Analyzer
-                    </button>
-                </a>
-                <a href="admanager.html">
-                    <button class="mt-2 w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
-                        Advertising Opportunities
-                    </button>
-                <button class="mt-2 w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    Invoice Generator
-                </button>
+            <!-- Tools Section -->
+            <div class="mt-6 text-gray-700">
+                <h3 class="text-xl font-semibold mt-6 mb-3">Tools</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <a href="jobapp.html">
+                        <button class="custom-btn text-base py-3" style="background: #544bdb;">
+                            Job Application Analyzer
+                        </button>
+                    </a>
+                    <a href="admanager.html">
+                        <button class="custom-btn text-base py-3" style="background: #75c6e4;">
+                            Advertising Opportunities
+                        </button>
+                    </a>
+                    <a href="inventory.html">
+                        <button class="custom-btn text-base py-3" style="background: #4d7adc;">
+                            Inventory Management
+                        </button>
+                    </a>
+                    <a href="lawyertipeting.html">
+                        <button class="custom-btn text-base py-3" style="background: #59e2db;">
+                            Contract Simplifier
+                        </button>
+                    </a>
+                    <a href="calendar.html">
+                        <button class="custom-btn text-base py-3" style="background: #6b54d2;">
+                            Calendar Management
+                        </button>
+                    </a>
+                    <a href="manage_employees.html">
+                        <button class="custom-btn text-base py-3" style="background: #5ec5f5;">
+                            Employee Management
+                        </button>
+                    </a>
+                </div>
             </div>
         </section>
     </main>
@@ -56,15 +85,25 @@
     <footer class="bg-gray-800 p-4 text-center text-white text-sm">
         &copy; 2025 Small Business Financial Tools. All rights reserved.
         <br>
-        <a href="/static/pages/index.html" class="underline text-blue-300">Back to Login</a>
+        <a href="index.html" class="underline text-blue-300">Log out</a>
     </footer>
+    
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const username = urlParams.get('username');
-        if (username) {
-            document.getElementById('welcomeMessage').textContent = 'Welcome, ' + username + '!';
+        let username = urlParams.get('username') || localStorage.getItem('username');
+        let userId = localStorage.getItem('user_id'); // Retrieve user ID
+        let email = localStorage.getItem('email'); // Retrieve email
+        let companyName = localStorage.getItem('company_name'); // Retrieve company name
+
+        if (!username || !userId) {
+            window.location.href = "index.html";
+        } else {
+            
+            document.getElementById('welcomeMessage').textContent = `Welcome to your dashboard, ${username}!`;
+            document.getElementById('emailDisplay').textContent = `Email: ${email}`;
+            document.getElementById('companyNameDisplay').textContent = `Company: ${companyName}`;
+            localStorage.setItem('username', username);
         }
-        localStorage.removeItem('username');
     </script>
 </body>
 </html>
