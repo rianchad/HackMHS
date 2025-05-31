@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-600 p-4 text-white text-center text-2xl font-bold">
+        Ad Manager
+    </header>
+    <main class="flex-1 p-6 flex flex-col items-center">
+        <form id="adForm" class="bg-white p-6 rounded shadow w-full max-w-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Find Advertising Opportunities</h2>
+            <label class="block mb-2 font-medium" for="businessType">Business Type</label>
+            <select id="businessType" name="businessType" required class="w-full mb-4 p-2 border rounded">
+                <option value="" disabled selected>Select a business type</option>
+                <option value="store">Store</option>
+                <option value="restaurant">Restaurant/Food</option>
+                <option value="service">Service</option>
+                <option value="other">Other</option>
+            </select>
+            <input id="otherBusinessType" name="otherBusinessType" type="text" class="w-full mb-4 p-2 border rounded hidden" placeholder="Please specify your business type">
+            <label class="block mb-2 font-medium" for="location">Location</label>
+            <input id="county" name="county" type="text" required class="w-full mb-4 p-2 border rounded" placeholder="e.g. Essex County">
+            <input id="state" name="state" type="text" required class="w-full mb-4 p-2 border rounded" placeholder="e.g. New Jersey">
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Search Ads
+            </button>
+        </form>
+        <section id="adResults" class="w-full max-w-md"></section>
+    </main>
+    <footer class="bg-gray-800 p-4 text-center text-white text-sm">
+        &copy; 2025 Small Business Financial Tools. All rights reserved.
+        <br>
+        <a href="/static/pages/home.html" class="underline text-blue-300">Back to Home</a>
+    </footer>
+    <script>
+        // Show/hide the custom input if "Other" is selected
+        document.getElementById('businessType').addEventListener('change', function() {
+            const otherInput = document.getElementById('otherBusinessType');
+            if (this.value === 'other') {
+                otherInput.classList.remove('hidden');
+                otherInput.required = true;
+            } else {
+                otherInput.classList.add('hidden');
+                otherInput.required = false;
+                otherInput.value = '';
+            }
+        });
+
+        document.getElementById('adForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            let businessType = document.getElementById('businessType').value;
+            const otherBusinessType = document.getElementById('otherBusinessType').value;
+            if (businessType === 'other' && otherBusinessType.trim() !== '') {
+                businessType = otherBusinessType.trim();
+            }
+            const county = document.getElementById('county').value;
+            const state = document.getElementById('state').value;
+            const resultsSection = document.getElementById('adResults');
+            resultsSection.innerHTML = '<div class="text-gray-600">Searching...</div>';
+            try {
+                const response = await fetch('/api/find_ads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ business_type: businessType, county: county, state: state })
+                });
+                let data;
+                try {
+                    data = await response.json();
+                } catch (jsonErr) {
+                    resultsSection.innerHTML = `<div class="text-red-600">Server error or not JSON. Check if the backend is running and returning JSON.</div>`;
+                    return;
+                }
+                if (data.success && data.ads.length > 0) {
+                    resultsSection.innerHTML = data.ads.map(ad => `
+                        <div class="bg-white p-4 mb-4 rounded shadow">
+                            <a href="${ad.link}" target="_blank" class="text-blue-600 font-bold">${ad.title}</a>
+                            <p class="text-gray-700 mt-2">${ad.snippet}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    resultsSection.innerHTML = `<div class="text-red-600">${data.error ? 'Error: ' + data.error : 'No ads found.'}</div>`;
+                }
+            } catch (err) {
+                resultsSection.innerHTML = `<div class="text-red-600">Error fetching ads: ${err.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

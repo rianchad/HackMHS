@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Finance Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-blue-600 p-4 text-white text-center text-2xl font-bold">
+        Business Finance Manager
+        <div id="welcomeMessage" class="text-base font-normal mt-2"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Financial Overview -->
+        <section class="bg-white p-4 rounded shadow">
+            <h2 class="text-xl font-semibold mb-4">Financial Overview</h2>
+            <p class="text-gray-700">View your revenue, expenses, and profit summaries here.</p>
+            <a href="manage_revenue.html">
+                <button class="mt-4 w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Manage Revenue
+                </button>
+        </section>
+
+        <!-- ChatGPT Assistant -->
+        <section class="bg-white p-4 rounded shadow">
+            <h2 class="text-xl font-semibold mb-4">AI Assistant</h2>
+            <iframe src="https://chat.openai.com" class="w-full h-64 border rounded"></iframe>
+            <p class="text-gray-600 text-sm mt-2">Use the AI Assistant for quick advice or help with financial tasks.</p>
+        </section>
+
+        <!-- Tools Section -->
+        <section class="bg-white p-4 rounded shadow">
+            <h2 class="text-xl font-semibold mb-4">Tools</h2>
+            <div class="text-gray-700">
+                <a href="jobapp.html">
+                    <button class="mt-2 w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        Job Application Analyzer
+                    </button>
+                </a>
+                <a href="admanager.html">
+                    <button class="mt-2 w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                        Advertising Opportunities
+                    </button>
+                <button class="mt-2 w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    Invoice Generator
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 p-4 text-center text-white text-sm">
+        &copy; 2025 Small Business Financial Tools. All rights reserved.
+        <br>
+        <a href="/static/pages/index.html" class="underline text-blue-300">Back to Login</a>
+    </footer>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+        if (username) {
+            document.getElementById('welcomeMessage').textContent = 'Welcome, ' + username + '!';
+        }
+        localStorage.removeItem('username');
+    </script>
+</body>
+</html>

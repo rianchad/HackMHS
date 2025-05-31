@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Analysis Results</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+    .container { background: white; padding: 20px; border-radius: 8px; max-width: 800px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1);}
+    h1 { text-align: center; }
+    .candidate { border-bottom: 1px solid #eee; margin-bottom: 20px; padding-bottom: 10px; }
+    .best { background: #e0ffe0; }
+    .download-link { margin-top: 10px; display: block; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Analysis Results</h1>
+  {% if results %}
+    {% for result in results %}
+      <div class="candidate {% if best and result.file == best.file %}best{% endif %}">
+        <h2>{{ result.file }} {% if best and result.file == best.file %}(Best Fit){% endif %}</h2>
+        <strong>Score:</strong> {{ result.score }}<br>
+        <strong>Summary:</strong> {{ result.summary }}<br>
+        <strong>Pros:</strong> <pre>{{ result.pros }}</pre>
+        <strong>Cons:</strong> <pre>{{ result.cons }}</pre>
+        <a class="download-link" href="{{ url_for('jobapp_download_file', filename=(upload_dir + '/annotated_' + result.file)) }}">Download Annotated PDF</a>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No results found.</p>
+  {% endif %}
+  <a href="{{ url_for('index') }}">&#8592; Back</a>
+</div>
+</body>
+</html>

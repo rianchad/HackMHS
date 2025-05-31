@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Job Application Analyzer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    input[type="file"], textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #00416e;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #00518a;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Job Application Analyzer</h1>
+  <form action="/analyze" method="POST" enctype="multipart/form-data">
+    <label for="job">Job Description (paste or upload)</label>
+    <textarea name="job_description" rows="6" placeholder="Paste job description here..."></textarea>
+
+    <label for="applications">Upload Applications (PDFs)</label>
+    <input type="file" name="applications" multiple accept="application/pdf">
+
+    <button type="submit">Analyze Applications</button>
+  </form>
+</div>
+</body>
+</html>

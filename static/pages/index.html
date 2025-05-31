@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login System</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
+        <form id="registerForm" style="display: none;">
+            <label for="regUsername">Username:</label>
+            <input type="text" id="regUsername" name="regUsername" required>
+            <label for="regPassword">Password:</label>
+            <input type="password" id="regPassword" name="regPassword" required>
+            <button type="submit">Register</button>
+        </form>
+        <p id="message"></p>
+        <a id="toggleForm" class="toggle-link">Don't have an account? Register</a>
+    </div>
+    <script>
+        // Toggle between login and register forms
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const toggleForm = document.getElementById('toggleForm');
+        const message = document.getElementById('message');
+
+        toggleForm.addEventListener('click', function() {
+            if (loginForm.style.display !== 'none') {
+                loginForm.style.display = 'none';
+                registerForm.style.display = '';
+                toggleForm.textContent = 'Already have an account? Login';
+                message.textContent = '';
+            } else {
+                loginForm.style.display = '';
+                registerForm.style.display = 'none';
+                toggleForm.textContent = "Don't have an account? Register";
+                message.textContent = '';
+            }
+        });
+
+        // Handle login
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(async response => {
+                const data = await response.json();
+                if (response.ok) {
+                    // Redirect to home with username in URL
+                    window.location.href = `/static/pages/home.html?username=${encodeURIComponent(username)}`;
+                } else {
+                    message.textContent = data.message || 'Login failed.';
+                }
+            })
+            .catch(() => {
+                message.textContent = 'Unable to connect to server.';
+            });
+        });
+
+        // Handle register
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(async response => {
+                const data = await response.json();
+                if (response.ok) {
+                    // Redirect to home with username in URL
+                    window.location.href = `/static/pages/home.html?username=${encodeURIComponent(username)}`;
+                } else {
+                    message.textContent = data.message || 'Registration failed.';
+                }
+            })
+            .catch(() => {
+                message.textContent = 'Unable to connect to server.';
+            });
+        });
+    </script>
+</body>
+</html>

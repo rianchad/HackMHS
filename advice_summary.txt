@@ -1,0 +1,20 @@
+<b>Cashflow Simulation Summary</b><br>
+<b>Starting Money:</b> $100,000.00<br>
+<b>Profit Margin:</b> 30.00%<br>
+<b>Interest Rate:</b> 3.00%<br>
+<b>Loan Term:</b> 180 days<br>
+<b>Min Cash Reserve Ratio:</b> 20.00%<br><br>
+<b>Recent Expense Payments & Loans:</b><ul>
+</ul>
+<b>Recent Loans Taken:</b>
+
+<table style="border-collapse:collapse;">
+<tr>
+  <th style="border:1px solid #ccc;padding:4px;">Amount</th>
+  <th style="border:1px solid #ccc;padding:4px;">Taken On</th>
+  <th style="border:1px solid #ccc;padding:4px;">Due Date</th>
+  <th style="border:1px solid #ccc;padding:4px;">Total Due</th>
+</tr>
+
+</table>
+<b>Final Expected Money:</b> $148,990.39

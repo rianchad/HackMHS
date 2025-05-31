@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Revenue</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-blue-600 p-4 text-white text-center text-2xl font-bold">
+        Manage Revenue
+    </header>
+    <main class="flex-1 flex items-start justify-center mt-10">
+        <!-- Parameters Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 w-1/4 mr-6">
+            <h2 class="text-xl font-semibold text-blue-700 mb-4">Parameters</h2>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-1">Profit Margin (%)</label>
+                <input type="number" id="profitMargin" value="30" min="0" max="100" step="0.01" class="block w-full border border-gray-300 rounded px-3 py-2 mb-2">
+                <label class="block text-gray-700 mb-1">Starting Money ($)</label>
+                <input type="number" id="moneyStarting" value="100000" min="0" step="1" class="block w-full border border-gray-300 rounded px-3 py-2 mb-2">
+                <label class="block text-gray-700 mb-1">Interest Rate (%)</label>
+                <input type="number" id="interestRate" value="3" min="0" max="100" step="0.01" class="block w-full border border-gray-300 rounded px-3 py-2 mb-2">
+                <label class="block text-gray-700 mb-1">Loan Term (days)</label>
+                <input type="number" id="loanTermDays" value="180" min="1" step="1" class="block w-full border border-gray-300 rounded px-3 py-2 mb-2">
+                <label class="block text-gray-700 mb-1">Min Cash Reserve Ratio (%)</label>
+                <input type="number" id="minCashReserveRatio" value="20" min="0" max="100" step="0.01" class="block w-full border border-gray-300 rounded px-3 py-2">
+            </div>
+        </div>
+        <!-- Main Content Section -->
+        <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+            <h1 class="text-2xl font-semibold text-blue-700 mb-6">Upload Revenue CSV</h1>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-1">Revenue CSV</label>
+                <input type="file" id="csvFile" accept=".csv" class="block w-full text-gray-700 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 mb-2">
+                <label class="block text-gray-700 mb-1">Past Data CSV</label>
+                <input type="file" id="pastDataFile" accept=".csv" class="block w-full text-gray-700 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+            <button id="uploadCsv" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-3 transition-colors">
+                Upload CSV
+            </button>
+            <button id="predictRevenue" disabled class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-3 transition-colors">
+                Predict Revenue
+            </button>
+            <button id="getAdvice" disabled class="w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mb-3 transition-colors">
+                Get Financial Advice
+            </button>
+            <div id="revenueMessage" class="min-h-[24px] text-center text-gray-700 mb-4"></div>
+            <div id="adviceMessage" class="min-h-[24px] text-center text-gray-700 mb-4"></div>
+            <div id="adviceSummary" class="bg-gray-50 border border-gray-300 rounded p-4 text-sm text-left mb-4 whitespace-normal" style="display:none;"></div>
+            <div id="adviceDownload" class="text-center mb-4" style="display:none;">
+                <a id="adviceCsvLink" href="#" download="suggested_price_changes_relative.csv" class="text-blue-600 underline">Download Advice CSV</a>
+            </div>
+            <div class="flex flex-col space-y-2">
+                <a href="/static/pages/home.html" class="text-blue-600 hover:underline text-center">Back to Home</a>
+                <a href="/static/pages/index.html" class="text-blue-600 hover:underline text-center">Back to Login</a>
+            </div>
+        </div>
+        <!-- Expenses Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 w-[28rem] ml-6">
+            <h2 class="text-xl font-semibold text-blue-700 mb-4">Expenses</h2>
+            <form id="expensesForm">
+                <table class="w-full text-sm mb-2" id="expensesTable">
+                    <thead>
+                        <tr>
+                            <th class="px-1 py-1">Name</th>
+                            <th class="px-1 py-1">Cost</th>
+                            <th class="px-1 py-1">Due Date</th>
+                            <th class="px-1 py-1">Other Dates</th>
+                            <th class="px-1 py-1">Urgency</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensesList"></tbody>
+                </table>
+                <button type="button" id="addExpense" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mb-2">Add Expense</button>
+            </form>
+        </div>
+    </main>
+    <footer class="bg-gray-800 p-4 text-center text-white text-sm mt-8">
+        &copy; 2025 Small Business Financial Tools. All rights reserved.
+    </footer>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('uploadCsv').addEventListener('click', function() {
+            const fileInput = document.getElementById('csvFile');
+            const pastDataInput = document.getElementById('pastDataFile');
+            const file = fileInput.files[0];
+            const pastDataFile = pastDataInput.files[0];
+            if (!file || !pastDataFile) {
+                document.getElementById('revenueMessage').textContent = 'Please select both CSV files.';
+                return;
+            }
+            const formData = new FormData();
+            formData.append('revenue_csv', file);
+            formData.append('past_data_csv', pastDataFile);
+
+            fetch('/upload_csv', {
+                method: 'POST',
+                body: formData
+            })
+            .then(async response => {
+                const data = await response.json();
+                document.getElementById('revenueMessage').textContent = data.message;
+                if (response.ok) {
+                    document.getElementById('predictRevenue').disabled = false;
+                }
+            })
+            .catch(error => {
+                document.getElementById('revenueMessage').textContent = 'Upload failed: ' + error.message;
+            });
+        });
+
+        document.getElementById('predictRevenue').addEventListener('click', function() {
+            fetch('/predict_revenue', {
+                method: 'POST'
+            })
+            .then(async response => {
+                if (response.ok) {
+                    // Download the file
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'df_revised.csv'; // changed filename
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    document.getElementById('revenueMessage').textContent = 'Prediction complete. Cashflow simulation (df_revised.csv) download started.';
+                    document.getElementById('getAdvice').disabled = false;
+                } else {
+                    const data = await response.json();
+                    document.getElementById('revenueMessage').textContent = data.message || 'Prediction failed.';
+                }
+            })
+            .catch(error => {
+                document.getElementById('revenueMessage').textContent = 'Prediction failed: ' + error.message;
+            });
+        });
+
+        // Expense List Logic (table-based, cleaner)
+        const expensesList = document.getElementById('expensesList');
+        document.getElementById('addExpense').addEventListener('click', function() {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="expense-name border border-gray-300 rounded px-1 py-1 w-24" required></td>
+                <td><input type="number" class="expense-cost border border-gray-300 rounded px-1 py-1 w-16" required></td>
+                <td><input type="date" class="expense-due border border-gray-300 rounded px-1 py-1 w-28" required></td>
+                <td><input type="text" class="expense-other border border-gray-300 rounded px-1 py-1 w-32" placeholder="YYYY-MM-DD,YYYY-MM-DD"></td>
+                <td><input type="number" class="expense-urgency border border-gray-300 rounded px-1 py-1 w-12" min="0" max="5" value="0"></td>
+                <td><button type="button" class="remove-expense bg-red-200 hover:bg-red-400 text-red-800 font-bold px-2 py-1 rounded">✕</button></td>
+            `;
+            tr.querySelector('.remove-expense').addEventListener('click', function() {
+                tr.remove();
+            });
+            expensesList.appendChild(tr);
+        });
+
+        document.getElementById('getAdvice').addEventListener('click', function() {
+            document.getElementById('adviceMessage').textContent = 'Generating advice...';
+            document.getElementById('adviceSummary').style.display = 'none';
+            document.getElementById('adviceDownload').style.display = 'none';
+            // Collect user parameters
+            const profitMargin = parseFloat(document.getElementById('profitMargin').value) / 100;
+            const moneyStarting = parseFloat(document.getElementById('moneyStarting').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value) / 100;
+            const loanTermDays = parseInt(document.getElementById('loanTermDays').value, 10);
+            const minCashReserveRatio = parseFloat(document.getElementById('minCashReserveRatio').value) / 100;
+            // Collect expenses
+            const expenseRows = expensesList.querySelectorAll('tr');
+            const expenses = [];
+            expenseRows.forEach(tr => {
+                const name = tr.querySelector('.expense-name').value.trim();
+                const cost = parseFloat(tr.querySelector('.expense-cost').value);
+                const due = tr.querySelector('.expense-due').value;
+                const other = tr.querySelector('.expense-other').value.trim();
+                const urgency = parseInt(tr.querySelector('.expense-urgency').value, 10) || 0;
+                if (name && cost && due) {
+                    expenses.push({
+                        name,
+                        cost,
+                        due_date: due,
+                        other_possible_dates: other ? other.split(',').map(s => s.trim()).filter(Boolean) : [],
+                        urgency
+                    });
+                }
+            });
+            const params = {
+                profit_margin: profitMargin,
+                money_starting: moneyStarting,
+                interest_rate: interestRate,
+                loan_term_days: loanTermDays,
+                min_cash_reserve_ratio: minCashReserveRatio,
+                expenses: expenses
+            };
+            fetch('/get_advice', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(params)
+            })
+            .then(async response => {
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('adviceMessage').textContent = 'Advice generated below.';
+                    // Render advice as HTML for cleaner formatting
+                    const adviceDiv = document.getElementById('adviceSummary');
+                    adviceDiv.innerHTML = data.advice || '';
+                    adviceDiv.style.display = 'block';
+                    if (data.csv_download_url) {
+                        // Auto-download the CSV
+                        const a = document.createElement('a');
+                        a.href = data.csv_download_url;
+                        a.download = 'suggested_price_changes_relative.csv';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        document.getElementById('adviceDownload').style.display = 'block';
+                        document.getElementById('adviceCsvLink').href = data.csv_download_url;
+                    }
+                } else {
+                    const data = await response.json();
+                    document.getElementById('adviceMessage').textContent = data.message || 'Advice generation failed.';
+                }
+            })
+            .catch(error => {
+                document.getElementById('adviceMessage').textContent = 'Advice generation failed: ' + error.message;
+            });
+        });
+    });
+    </script>
+</body>
+</html>
